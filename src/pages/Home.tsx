@@ -1,28 +1,21 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
-import type { Coin } from "../types/coin";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useCoinStore } from "../store/useCoinStore";
+import type { TSortKey, TSortOrder } from "../types/types";
 
 function Home() {
-  const [coins, setCoins] = useState<Coin[]>([]);
-  const [visibleCount, setVisibleCount] = useState(10);
-  const [sortKey, setSortKey] = useState<"name" | "price">("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
+  const { coins, fetchCoins, hasMore, loading } = useCoinStore();
+  const [sortKey, setSortKey] = useState<TSortKey>("name");
+  const [sortOrder, setSortOrder] = useState<TSortOrder>("asc");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
-    axios
-      .get(API_URL, {
-        params: { vs_currency: "usd" },
-      })
-      .then((res) => setCoins(res.data))
-      .catch(() => alert("Error loading coins"));
+    if (coins.length === 0) {
+      fetchCoins();
+    }
   }, []);
 
-  const handleSort = (key: "name" | "price") => {
+  const handleSort = (key: TSortKey) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -72,7 +65,7 @@ function Home() {
           </tr>
         </thead>
         <tbody>
-          {sortedCoins.slice(0, visibleCount).map((c) => (
+          {sortedCoins.map((c) => (
             <tr key={c.id} className="text-center relative">
               <td className="border px-3 py-2">
                 <img src={c.image} alt={c.name} className="w-6 h-6 mx-auto" />
@@ -90,26 +83,7 @@ function Home() {
                 </button>
 
                 {openDropdown === c.id && (
-                  <div
-                    className="absolute right-0 mt-2 w-28 bg-white border rounded shadow-lg z-10"
-                    tabIndex={0}
-                    ref={(el) => {
-                      if (el) {
-                        const handleClick = (e: MouseEvent) => {
-                          if (!el.contains(e.target as Node)) {
-                            setOpenDropdown(null);
-                          }
-                        };
-                        document.addEventListener("mousedown", handleClick);
-                        return () => {
-                          document.removeEventListener(
-                            "mousedown",
-                            handleClick
-                          );
-                        };
-                      }
-                    }}
-                  >
+                  <div className="absolute right-0 mt-2 w-28 bg-white border rounded shadow-lg z-10">
                     <button className="block px-4 py-2 w-full hover:bg-gray-200">
                       Buy
                     </button>
@@ -124,11 +98,15 @@ function Home() {
         </tbody>
       </table>
 
-      {visibleCount < coins.length && (
+      {hasMore && (
         <div className="text-center">
-          <Button onClick={() => setVisibleCount(visibleCount + 10)}>
-            Load More
-          </Button>
+          {loading ? (
+            <span>Loading...</span>
+          ) : (
+            <Button onClick={fetchCoins}>
+              {loading ? "Loading..." : "Load More"}
+            </Button>
+          )}
         </div>
       )}
     </div>

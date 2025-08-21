@@ -1,39 +1,44 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import useUserStore from "../store/userStore";
+import { useEffect, useMemo, useState } from "react";
+import useUserStore from "../store/useUserStore";
+import { useAllCoinsStore } from "../store/useAllCoinsStore";
 import Button from "../components/Button";
-import type { Coin } from "../types/coin";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import Select from "../components/Select";
+import InputField from "../components/InputField";
+import type { TTradeState } from "../types/types";
+import useTradeCalculator from "../hooks/useTradeCalculator";
 
 function Trade() {
   const { user } = useUserStore();
-  const [coins, setCoins] = useState<Coin[]>([]);
-  const [selectedCoin, setSelectedCoin] = useState("bitcoin");
+  const { coins, fetchAllCoins, loading } = useAllCoinsStore();
 
-  const [isCryptoFirst, setIsCryptoFirst] = useState(true);
-  const [inputValue, setInputValue] = useState<number>(0);
-  const [outputValue, setOutputValue] = useState<number>(0);
+  const [tradeState, setTradeState] = useState<TTradeState>({
+    selectedCoin: "bitcoin",
+    isCryptoFirst: true,
+    inputValue: "",
+    outputValue: "",
+  });
 
   useEffect(() => {
-    axios
-      .get(API_URL, {
-        params: { vs_currency: "usd" },
-      })
-      .then((res) => setCoins(res.data))
-      .catch(() => alert("Error loading coins"));
-  }, []);
+    if (coins.length === 0) fetchAllCoins();
+  }, [coins, fetchAllCoins]);
 
   const selectedCoinPrice =
-    coins.find((c) => c.id === selectedCoin)?.current_price || 0;
+    coins.find((c) => c.id === tradeState.selectedCoin)?.current_price || 0;
 
-  useEffect(() => {
-    if (isCryptoFirst) {
-      setOutputValue(inputValue * selectedCoinPrice);
-    } else {
-      setOutputValue(inputValue / selectedCoinPrice);
-    }
-  }, [inputValue, selectedCoin, isCryptoFirst, selectedCoinPrice]);
+  const { handleSwap } = useTradeCalculator(
+    tradeState,
+    setTradeState,
+    selectedCoinPrice
+  );
+
+  const options = useMemo(
+    () =>
+      coins.map((c) => ({
+        label: `${c.symbol.toUpperCase()} · ${c.name}`,
+        value: c.id,
+      })),
+    [coins]
+  );
 
   if (!user) {
     return (
@@ -43,64 +48,78 @@ function Trade() {
     );
   }
 
+  if (loading && coins.length === 0) {
+    return <div className="p-6 text-center">Loading coins...</div>;
+  }
+
   return (
-    <div className="p-6 max-w-lg mx-auto border rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4">Trade</h2>
+    <div className="p-6 max-w-xl mx-auto border rounded-2xl shadow-lg">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Trade</h2>
+        <div className="text-xs opacity-70">Live price · USD</div>
+      </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          {isCryptoFirst ? "Crypto Amount" : "Fiat Amount (USD)"}
-        </label>
-        <div className="flex gap-2">
-          <input
+        <div className="flex gap-2 items-center">
+          <InputField
+            label={
+              tradeState.isCryptoFirst ? "Crypto Amount" : "Fiat Amount (USD)"
+            }
             type="number"
-            className="border px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-500"
-            value={inputValue}
-            onChange={(e) => setInputValue(parseFloat(e.target.value) || 0)}
+            value={tradeState.inputValue}
+            onChange={(e) =>
+              setTradeState((s) => ({ ...s, inputValue: e.target.value }))
+            }
+            placeholder={tradeState.isCryptoFirst ? "0.0" : "0.00"}
+            width="w-1/2"
           />
-          {isCryptoFirst && (
-            <select
-              value={selectedCoin}
-              onChange={(e) => setSelectedCoin(e.target.value)}
-              className="border px-2 py-2 rounded"
-            >
-              {coins.slice(0, 20).map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+          {tradeState.isCryptoFirst ? (
+            <Select
+              value={tradeState.selectedCoin}
+              onChange={(v) =>
+                setTradeState((s) => ({ ...s, selectedCoin: v }))
+              }
+              options={options}
+              className="w-1/2 mt-2"
+            />
+          ) : (
+            <div className="text-right text-neutral-500 px-2 py-2">USD</div>
           )}
+        </div>
+        <div className="mt-2 text-xs text-neutral-500">
+          {selectedCoinPrice
+            ? `${options.find((o) => o.value === tradeState.selectedCoin)?.label} ≈ $${selectedCoinPrice.toLocaleString()}`
+            : "Select a crypto"}
         </div>
       </div>
 
-      <div className="flex justify-center mb-4">
-        <Button onClick={() => setIsCryptoFirst(!isCryptoFirst)}>⇅ Swap</Button>
+      <div className="flex justify-center my-4">
+        <Button onClick={handleSwap}>⇅ Swap</Button>
       </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          {isCryptoFirst ? "Fiat Amount (USD)" : "Crypto Amount"}
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            className="border px-3 py-2 rounded w-full bg-gray-100"
-            value={outputValue}
-            readOnly
+      <div className="mt-3">
+        <div className="flex gap-2 items-center">
+          <InputField
+            label={
+              tradeState.isCryptoFirst ? "Fiat Amount (USD)" : "Crypto Amount"
+            }
+            type="text"
+            value={tradeState.outputValue}
+            onChange={() => {}}
+            placeholder="0"
+            width="w-full"
           />
-          {!isCryptoFirst && (
-            <select
-              value={selectedCoin}
-              onChange={(e) => setSelectedCoin(e.target.value)}
-              className="border px-2 py-2 rounded"
-            >
-              {coins.slice(0, 20).map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+          {!tradeState.isCryptoFirst ? (
+            <Select
+              value={tradeState.selectedCoin}
+              onChange={(v) =>
+                setTradeState((s) => ({ ...s, selectedCoin: v }))
+              }
+              options={options}
+              className="w-52 mt-2"
+            />
+          ) : (
+            <div className="text-right text-neutral-500 px-2 py-2">USD</div>
           )}
         </div>
       </div>

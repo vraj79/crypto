@@ -1,224 +1,133 @@
-import React, { useState } from "react";
-import useUserStore from "../store/userStore";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import type { TLoginForm, TPageType } from "../types/types";
+import useAuth from "../hooks/useAuth";
+import useModal from "../hooks/useModal";
+import InputField from "./InputField";
+import Button from "./Button";
 
 const Navbar: React.FC = () => {
-  const [activePage, setActivePage] = useState<"home" | "trade">("home");
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [activePage, setActivePage] = React.useState<TPageType>("home");
+  const [loginForm, setLoginForm] = React.useState<TLoginForm>({
+    email: "",
+    password: "",
+  });
+
+  const { email, handleLogin, handleLogout, isAuthenticated } = useAuth();
+  const { modal, open, close, setError } = useModal();
   const navigate = useNavigate();
 
-  const handleNavClick = (page: "home" | "trade") => {
-    if(isLoggedIn && page === "trade" && !useUserStore.getState().user) {
-      alert("Please log in to access the Trade page.");
+  const handleNavClick = (page: TPageType) => {
+    if (page === "trade" && !isAuthenticated) {
+      open();
       return;
     }
     setActivePage(page);
-    navigate(`/${page}`);
+    navigate(page === "home" ? "/crypto/" : `/crypto/${page}`);
   };
-
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
-  };
-
-  const { user, login, logout } = useUserStore();
-
-  const [error, setError] = useState("");
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!loginForm.email.includes("@") || loginForm.password.length < 4) {
-      setError("Invalid email or password (min 4 chars)");
-      console.log(error);
-      return;
-    }
-    login(loginForm.email);
-    setIsLoggedIn(true);
-    setShowLoginModal(false);
+    handleLogin(
+      loginForm,
+      () => {
+        close();
+        setActivePage("trade");
+      },
+      (msg) => setError(msg)
+    );
   };
 
   return (
     <>
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          background: "#222",
-          color: "#fff",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 2rem",
-          height: "64px",
-          zIndex: 1000,
-        }}
-      >
-        <nav style={{ display: "flex", gap: "1.5rem" }}>
-          <button
-            style={{
-              background: "none",
-              border: "none",
-              color: activePage === "home" ? "#61dafb" : "#fff",
-              fontWeight: activePage === "home" ? "bold" : "normal",
-              fontSize: "1rem",
-              cursor: "pointer",
-            }}
+      <header className="sticky top-0 z-50 flex h-16 items-center justify-between bg-neutral-900 px-8 text-white">
+        <nav className="flex gap-6">
+          <Button
             onClick={() => handleNavClick("home")}
+            variant="ghost"
+            className={`text-base ${
+              activePage === "home"
+                ? "text-sky-400 font-bold"
+                : "text-white font-normal"
+            }`}
           >
             Home
-          </button>
+          </Button>
 
-          <button
-            style={{
-              background: "none",
-              border: "none",
-              color: activePage === "trade" ? "#61dafb" : "#fff",
-              fontWeight: activePage === "trade" ? "bold" : "normal",
-              fontSize: "1rem",
-              cursor: "pointer",
-            }}
+          <Button
             onClick={() => handleNavClick("trade")}
+            variant="ghost"
+            className={`text-base ${
+              activePage === "trade"
+                ? "text-sky-400 font-bold"
+                : "text-white font-normal"
+            }`}
           >
             Trade
-          </button>
+          </Button>
         </nav>
+
         <div>
-          {isLoggedIn ? (
-            <>
-              <span style={{ marginRight: "1rem" }}>
-                {user?.email}
-              </span>
-              <button
-                style={{
-                  background: "#ff4d4f",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "0.5rem 1rem",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-                onClick={() => {
-                  logout();
-                  setIsLoggedIn(false);
-                }}
-              >
-                Log Out
-              </button>
-            </>
-          ) : (
-            <button
-              style={{
-                background: "#61dafb",
-                color: "#222",
-                border: "none",
-                borderRadius: "4px",
-                padding: "0.5rem 1rem",
-                cursor: "pointer",
-                fontWeight: "bold",
-              }}
-              onClick={() => setShowLoginModal(true)}
-            >
-              Log In
-            </button>
-          )}
+          <div>
+            {isAuthenticated ? (
+              <>
+                <span className="mr-4">{email}</span>
+                <Button onClick={handleLogout} variant="danger">
+                  Log Out
+                </Button>
+              </>
+            ) : (
+              <Button onClick={open} variant="primary">
+                Log In
+              </Button>
+            )}
+          </div>
         </div>
       </header>
-      {showLoginModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 2000,
-          }}
-        >
+
+      {modal.show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <form
             onSubmit={handleLoginSubmit}
-            style={{
-              background: "#fff",
-              padding: "2rem",
-              borderRadius: "8px",
-              minWidth: "300px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-            }}
+            className="flex min-w-[400px] flex-col gap-4 rounded-lg bg-white p-8 shadow-lg"
           >
-            <h2 style={{ margin: 0, color: "#222" }}>Log In</h2>
-            <input
+            <h2 className="text-xl font-bold text-neutral-900">Log In</h2>
+
+            <InputField
+              label="Email"
               type="email"
-              name="email"
-              placeholder="Email"
               value={loginForm.email}
-              onChange={handleLoginChange}
-              required
-              style={{
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
+              onChange={(e) =>
+                setLoginForm({ ...loginForm, email: e.target.value })
+              }
+              placeholder="Enter your email"
             />
-            <input
+
+            <InputField
+              label="Password"
               type="password"
-              name="password"
-              placeholder="Password"
               value={loginForm.password}
-              onChange={handleLoginChange}
-              required
-              style={{
-                padding: "0.5rem",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-              }}
+              onChange={(e) =>
+                setLoginForm({ ...loginForm, password: e.target.value })
+              }
+              placeholder="Enter your password"
             />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "0.5rem",
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setShowLoginModal(false)}
-                style={{
-                  background: "#eee",
-                  color: "#222",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "0.5rem 1rem",
-                  cursor: "pointer",
-                }}
-              >
+
+            {modal.error && (
+              <p className="text-sm text-red-500">{modal.error}</p>
+            )}
+            <div className="flex justify-end gap-2">
+              <Button type="button" onClick={close} variant="secondary">
                 Cancel
-              </button>
-              <button
-                type="submit"
-                style={{
-                  background: "#61dafb",
-                  color: "#222",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "0.5rem 1rem",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-              >
+              </Button>
+              <Button type="submit" variant="primary">
                 Log In
-              </button>
+              </Button>
             </div>
           </form>
         </div>
       )}
-      <main style={{ padding: "2rem" }}></main>
+      <main className="p-4"></main>
     </>
   );
 };

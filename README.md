@@ -49,8 +49,8 @@ The app supports authentication (via Zustand store), reusable UI components, and
 
 ### src/App.tsx
 - Root component managing **routes**:
-  - `/` and `/home` → Home Page.  
-  - `/trade` → Trade Page (protected).  
+  - `/crypto/` and `` → Home Page.  
+  - `/crypto/trade` → Trade Page (protected).  
 - Always renders `<Navbar />`.  
 
 ---
