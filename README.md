@@ -122,11 +122,4 @@ The app supports authentication (via Zustand store), reusable UI components, and
   - USD → Crypto conversion.  
   - Swap between modes.  
 
----
-
-## ⚙️ Setup & Installation
-
-### 1. Clone repository
-```bash
-git clone https://github.com/yourusername/crypto-trading-app.git
-cd crypto-trading-app
+-----------------------------------------------------------------------------------------------------------------------------
