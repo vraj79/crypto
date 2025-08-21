@@ -1,69 +1,132 @@
-# React + TypeScript + Vite
+# 🚀 Crypto Trading App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite application that provides cryptocurrency data visualization and a simple trading simulation.  
+The app supports authentication (via Zustand store), reusable UI components, and API-based data fetching.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📑 Index
 
-## Expanding the ESLint configuration
+1. [Architecture Overview](#-architecture-overview)  
+2. [Project Files](#-project-files)  
+   - [src/main.tsx](#srcmaintsx)  
+   - [src/App.tsx](#srcapptsx)  
+   - [src/vite-env.d.ts](#srcvite-envdts)  
+   - [src/types/coin.ts](#srctypescoints)  
+   - [src/store/userStore.ts](#srcstoreuserstorets)  
+   - [src/components/Button.tsx](#srccomponentsbuttontsx)  
+   - [src/components/InputField.tsx](#srccomponentsinputfieldtsx)  
+   - [src/components/Navbar.tsx](#srccomponentsnavbartsx)  
+   - [src/Navbar.tsx](#srcnavbartsx)  
+   - [src/pages/Home.tsx](#srcpageshometsx)  
+   - [src/pages/Trade.tsx](#srcpagestradetsx)  
+3. [Setup & Installation](#-setup--installation)  
+4. [Tech Stack](#-tech-stack)  
+5. [Features](#-features)  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🏗️ Architecture Overview
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **main.tsx** → App entry point, mounts React and sets up routing.  
+- **App.tsx** → Root component that handles routes and global layout.  
+- **Navbar** → Provides navigation and authentication controls.  
+- **Home Page** → Displays cryptocurrency data in a sortable/paginated table.  
+- **Trade Page** → Provides a crypto ↔ USD converter (requires authentication).  
+- **Zustand Store** → Manages and persists authentication state.  
+- **Types** → Ensures consistent typing for coins and data.  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📂 Project Files
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### src/main.tsx
+- Entry point of the application.  
+- Mounts the React tree into the DOM.  
+- Wraps app with **BrowserRouter** and **React.StrictMode**.  
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+### src/App.tsx
+- Root component managing **routes**:
+  - `/` and `/home` → Home Page.  
+  - `/trade` → Trade Page (protected).  
+- Always renders `<Navbar />`.  
+
+---
+
+### src/vite-env.d.ts
+- TypeScript declaration file for Vite client types.  
+
+---
+
+### src/types/coin.ts
+- Defines the **Coin interface** with fields:
+  - `id`, `name`, `symbol`, `image`  
+  - `current_price` (USD), `price_change_percentage_24h`  
+
+---
+
+### src/store/userStore.ts
+- **Zustand store** with persistence:  
+  - State: `user` (`{ email: string } | null`)  
+  - Actions: `login(email)`, `logout()`  
+
+---
+
+### src/components/Button.tsx
+- Reusable button component.  
+- Props: `children`, `onClick`, `type`.  
+- Default styled with hover & transition.  
+
+---
+
+### src/components/InputField.tsx
+- Reusable labeled input component.  
+- Props: `label`, `type`, `value`, `onChange`.  
+- Used in forms such as login modal.  
+
+---
+
+### src/components/Navbar.tsx
+- Sticky top navigation bar.  
+- Navigation: **Home** / **Trade**.  
+- Authentication controls:
+  - Shows user email & Logout when logged in.  
+  - Login button opens modal with validation.  
+
+---
+
+### src/Navbar.tsx
+- Duplicate Navbar with different import paths.  
+- Functions the same as `src/components/Navbar.tsx`.  
+
+---
+
+### src/pages/Home.tsx
+- Displays a **paginated, sortable table** of coins.  
+- Fetches from `VITE_API_URL`.  
+- Features:
+  - Sort by name or price.  
+  - “Load More” functionality.  
+  - Dropdown menu per row (Buy/Sell placeholder).  
+
+---
+
+### src/pages/Trade.tsx
+- **Currency converter** (Crypto ↔ USD).  
+- Requires user authentication.  
+- Fetches coins from API.  
+- Features:
+  - Crypto → USD conversion.  
+  - USD → Crypto conversion.  
+  - Swap between modes.  
+
+---
+
+## ⚙️ Setup & Installation
+
+### 1. Clone repository
+```bash
+git clone https://github.com/yourusername/crypto-trading-app.git
+cd crypto-trading-app
