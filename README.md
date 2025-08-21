@@ -1,127 +1,164 @@
-# 🚀 Crypto Trading App
+# 🚀 Crypto Exchange React App
 
-A React + TypeScript + Vite application that provides cryptocurrency data visualization and a simple trading simulation.  
-The app supports authentication (via Zustand store), reusable UI components, and API-based data fetching.
+A React + TypeScript crypto dashboard built with **Vite** and **Tailwind CSS**.  
+It allows users to browse live cryptocurrency data and perform simple conversions (crypto ↔ USD).
 
----
-
-## 📑 Index
-
-1. [Architecture Overview](#-architecture-overview)  
-2. [Project Files](#-project-files)  
-   - [src/main.tsx](#srcmaintsx)  
-   - [src/App.tsx](#srcapptsx)  
-   - [src/vite-env.d.ts](#srcvite-envdts)  
-   - [src/types/coin.ts](#srctypescoints)  
-   - [src/store/userStore.ts](#srcstoreuserstorets)  
-   - [src/components/Button.tsx](#srccomponentsbuttontsx)  
-   - [src/components/InputField.tsx](#srccomponentsinputfieldtsx)  
-   - [src/components/Navbar.tsx](#srccomponentsnavbartsx)  
-   - [src/Navbar.tsx](#srcnavbartsx)  
-   - [src/pages/Home.tsx](#srcpageshometsx)  
-   - [src/pages/Trade.tsx](#srcpagestradetsx)  
-3. [Setup & Installation](#-setup--installation)  
-4. [Tech Stack](#-tech-stack)  
-5. [Features](#-features)  
+🔗 **Live Demo:** [Crypto Exchange](https://vraj79.github.io/crypto/)
 
 ---
 
-## 🏗️ Architecture Overview
+## 📑 Table of Contents
 
-- **main.tsx** → App entry point, mounts React and sets up routing.  
-- **App.tsx** → Root component that handles routes and global layout.  
-- **Navbar** → Provides navigation and authentication controls.  
-- **Home Page** → Displays cryptocurrency data in a sortable/paginated table.  
-- **Trade Page** → Provides a crypto ↔ USD converter (requires authentication).  
-- **Zustand Store** → Manages and persists authentication state.  
-- **Types** → Ensures consistent typing for coins and data.  
-
----
-
-## 📂 Project Files
-
-### src/main.tsx
-- Entry point of the application.  
-- Mounts the React tree into the DOM.  
-- Wraps app with **BrowserRouter** and **React.StrictMode**.  
-
----
-
-### src/App.tsx
-- Root component managing **routes**:
-  - `/crypto/` and `` → Home Page.  
-  - `/crypto/trade` → Trade Page (protected).  
-- Always renders `<Navbar />`.  
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Installation](#installation)
+4. [File-by-File Breakdown](#file-by-file-breakdown)
+   - vite-env.d.ts
+   - types/coin.ts
+   - store/userStore.ts
+   - components/Button.tsx
+   - components/InputField.tsx
+   - components/Navbar.tsx
+   - pages/Home.tsx
+   - pages/Trade.tsx
+   - App.tsx
+   - main.tsx
+5. [Component & Data Flow](#component--data-flow)
+6. [Conclusion](#conclusion)
 
 ---
 
-### src/vite-env.d.ts
-- TypeScript declaration file for Vite client types.  
+## 📖 Overview
+
+This app demonstrates a **crypto exchange dashboard** where users can:
+
+- View live market data
+- Sort and paginate coins
+- Convert between cryptocurrency and USD
+- Access protected trade features (login required)
+
+Built with:
+
+- **React Router** → for navigation
+- **Zustand** → for lightweight state management
+- **Axios** → for API requests
+- **TypeScript** → for strong typing
+- **Tailwind CSS** → for styling
 
 ---
 
-### src/types/coin.ts
-- Defines the **Coin interface** with fields:
-  - `id`, `name`, `symbol`, `image`  
-  - `current_price` (USD), `price_change_percentage_24h`  
+## ✨ Features
+
+- 🔐 **Authentication with Zustand (persisted state)**
+- 📊 **Sortable crypto table (Name & Price)**
+- 📈 **Live price-based conversion (Crypto ↔ USD)**
+- 🔄 **Swap conversion direction**
+- 🖼️ **Reusable UI components (Button, InputField, Navbar)**
+- 📱 **Responsive Tailwind design**
+- 🚧 **Protected Trade route (login required)**
 
 ---
 
-### src/store/userStore.ts
-- **Zustand store** with persistence:  
-  - State: `user` (`{ email: string } | null`)  
-  - Actions: `login(email)`, `logout()`  
+## ⚙️ Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/vraj79/crypto.git
+cd crypto
+npm install
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the build locally:
+
+```bash
+npm run preview
+```
 
 ---
 
-### src/components/Button.tsx
-- Reusable button component.  
-- Props: `children`, `onClick`, `type`.  
-- Default styled with hover & transition.  
+## 📂 File-by-File Breakdown
+
+### **vite-env.d.ts**
+
+Provides type declarations for Vite environment variables.
+
+### **types/coin.ts**
+
+Defines the structure of cryptocurrency objects used across the app.
+
+### **store/userStore.ts**
+
+Zustand store to manage persistent authentication state (`login`, `logout`).
+
+### **components/Button.tsx**
+
+Reusable Tailwind-styled button component.
+
+### **components/InputField.tsx**
+
+Standardized input with label and focus styling.
+
+### **components/Navbar.tsx**
+
+Navigation bar with login modal, logout, and route switching.
+
+### **pages/Home.tsx**
+
+Displays top cryptocurrencies in a sortable and paginated table.
+
+### **pages/Trade.tsx**
+
+Conversion tool for crypto ↔ USD with protected access (requires login).
+
+### **App.tsx**
+
+Root component managing routes and authentication guard.
+
+### **main.tsx**
+
+Entry point: mounts app, applies routing, and loads global styles.
 
 ---
 
-### src/components/InputField.tsx
-- Reusable labeled input component.  
-- Props: `label`, `type`, `value`, `onChange`.  
-- Used in forms such as login modal.  
+## 🌐 Component & Data Flow
+
+```mermaid
+flowchart LR
+  A[main.tsx] --> B[App.tsx]
+  B --> C[Navbar]
+  B --> D[Home Page]
+  B --> E[Trade Page]
+  C -->|reads/writes| F[userStore]
+  D -->|fetch via| G[(API)]
+  E -->|fetch via| G
+  D & E --> H[Button]
+  E --> I[Conversion Logic]
+  D --> J[Sortable Table]
+  E --> K[Swap ⇅]
+```
 
 ---
 
-### src/components/Navbar.tsx
-- Sticky top navigation bar.  
-- Navigation: **Home** / **Trade**.  
-- Authentication controls:
-  - Shows user email & Logout when logged in.  
-  - Login button opens modal with validation.  
+## 🏁 Conclusion
 
----
+This project is a solid starting point for a **crypto trading dashboard**. Its modular design—typed models, centralized store, reusable components, and routed pages—makes it easy to extend with features such as:
 
-### src/Navbar.tsx
-- Duplicate Navbar with different import paths.  
-- Functions the same as `src/components/Navbar.tsx`.  
+- Real “Buy/Sell” flows
+- Detailed coin analytics pages
+- Enhanced authentication
+- Data visualizations (charts, graphs)
 
----
-
-### src/pages/Home.tsx
-- Displays a **paginated, sortable table** of coins.  
-- Fetches from `VITE_API_URL`.  
-- Features:
-  - Sort by name or price.  
-  - “Load More” functionality.  
-  - Dropdown menu per row (Buy/Sell placeholder).  
-
----
-
-### src/pages/Trade.tsx
-- **Currency converter** (Crypto ↔ USD).  
-- Requires user authentication.  
-- Fetches coins from API.  
-- Features:
-  - Crypto → USD conversion.  
-  - USD → Crypto conversion.  
-  - Swap between modes.  
-
------------------------------------------------------------------------------------------------------------------------------
-
-### Deployed Link: https://vraj79.github.io/crypto/
+🔗 **Try it live here:** [Crypto Exchange](https://vraj79.github.io/crypto/)
