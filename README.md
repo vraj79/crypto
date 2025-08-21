@@ -123,3 +123,5 @@ The app supports authentication (via Zustand store), reusable UI components, and
   - Swap between modes.  
 
 -----------------------------------------------------------------------------------------------------------------------------
+
+### Deployed Link: https://vraj79.github.io/crypto/
