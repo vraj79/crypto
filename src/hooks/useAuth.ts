@@ -20,12 +20,12 @@ const useAuth = () => {
     }
     login(form.email);
     onSuccess();
-    navigate("/crypto/trade");
+    navigate("/trade");
   };
 
   const handleLogout = () => {
     logout();
-    navigate("/crypto/");
+    navigate("/");
   };
 
   return { email, handleLogin, handleLogout, isAuthenticated: !!user };

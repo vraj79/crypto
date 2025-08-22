@@ -9,11 +9,8 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/crypto/" element={<Home />} />
-        <Route
-          path="/crypto/trade"
-          element={<ProtectedRoute element={<Trade />} />}
-        />
+        <Route path="/" element={<Home />} />
+        <Route path="/trade" element={<ProtectedRoute element={<Trade />} />} />
       </Routes>
     </>
   );

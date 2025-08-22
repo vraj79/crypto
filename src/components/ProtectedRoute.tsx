@@ -12,7 +12,7 @@ const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
   const email = user ? decrypt(user.email) : null;
 
   if (!user || !email) {
-    return <Navigate to="/crypto/" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return element;
