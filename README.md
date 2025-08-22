@@ -1,139 +1,80 @@
-# 🚀 Crypto Exchange React App
+# Crypto trading app
 
-A React + TypeScript crypto dashboard built with **Vite** and **Tailwind CSS**.  
-It allows users to browse live cryptocurrency data and perform simple conversions (crypto ↔ USD).
+## Introduction
+It is a cryptocurrency exchange web application built using React, Vite, and TypeScript. It provides users with an interactive interface to view and trade crypto assets. The application features a dashboard that displays real-time coin data from an external API and a dedicated trade page that allows conversion between crypto and fiat currencies. State management is handled by Zustand, while styling is implemented using Tailwind CSS.
 
-🔗 **Live Demo:** [Crypto Exchange](https://vraj79.github.io/crypto/)
+## Features
 
----
+- **Crypto Dashboard:** An interactive home page to view a list of cryptocurrencies with their icons, names, and current prices.
+- **Sortable Assets List:** Users can sort cryptocurrencies by name or price. Toggle the sort order with a simple click.
+- **Trade Interface:** A dedicated trade page to convert between crypto and fiat currencies (USD). A swap feature enables quick switching between conversion directions.
+- **User Authentication:** A simple login modal is provided. Once logged in, users can access the trade page.
+- **Responsive Design:** The interface is styled with Tailwind CSS for a modern and responsive look.
+- **State Management:** Utilizes Zustand for managing user state and global data persistence.
+- **API Integration:** Coin data is fetched using Axios from an API endpoint defined by an environment variable.
 
-## 📑 Table of Contents
+## Requirements
 
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Installation](#installation)
-4. [File-by-File Breakdown](#file-by-file-breakdown)
-   - vite-env.d.ts
-   - types/coin.ts
-   - store/userStore.ts
-   - components/Button.tsx
-   - components/InputField.tsx
-   - components/Navbar.tsx
-   - pages/Home.tsx
-   - pages/Trade.tsx
-   - App.tsx
-   - main.tsx
-5. [Component & Data Flow](#component--data-flow)
-6. [Conclusion](#conclusion)
+Before running the application, ensure you have the following installed on your system:
 
----
+| **Tool**       | **Version or Higher**        |
+| -------------- | ---------------------------- |
+| Node.js        | 14.x or later                |
+| npm or Yarn    | Latest stable version        |
 
-## 📖 Overview
+Other dependencies managed by npm include React, React Router DOM, Axios, Zustand, and Tailwind CSS.
 
-This app demonstrates a **crypto exchange dashboard** where users can:
+## Installation
 
-- View live market data
-- Sort and paginate coins
-- Convert between cryptocurrency and USD
-- Access protected trade features (login required)
+Follow these steps to set up the project locally:
 
-Built with:
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/vraj79/crypto.git
+   cd crypto
+   ```
 
-- **React Router** → for navigation
-- **Zustand** → for lightweight state management
-- **Axios** → for API requests
-- **TypeScript** → for strong typing
-- **Tailwind CSS** → for styling
+2. **Install Dependencies:**
+   ```bash
+   npm install
+   ```
+   or if you prefer Yarn:
+   ```bash
+   yarn
+   ```
 
----
+3. **Set Up Environment Variables:**
+   Create a `.env` file in the root of the project and add the following variable:
+   ```env
+   VITE_API_URL=<your_api_endpoint>
+   ```
 
-## ✨ Features
+4. **Run the Development Server:**
+   ```bash
+   npm run dev
+   ```
+   This command starts the Vite development server.
 
-- 🔐 **Authentication with Zustand (persisted state)**
-- 📊 **Sortable crypto table (Name & Price)**
-- 📈 **Live price-based conversion (Crypto ↔ USD)**
-- 🔄 **Swap conversion direction**
-- 🖼️ **Reusable UI components (Button, InputField, Navbar)**
-- 📱 **Responsive Tailwind design**
-- 🚧 **Protected Trade route (login required)**
+## Usage
 
----
+Once the project is installed and the development server is running, here is how to get started:
 
-## ⚙️ Installation
+- **Home Page:**
+  - Visit the root URL (http://localhost:3000 or as shown in your terminal).
+  - Browse the list of crypto assets. You can sort by clicking on the column headers.
+  - Load more assets by clicking the "Load More" button.
 
-Clone the repository and install dependencies:
+- **Trade Page:**
+  - Click on the "Trade" menu item in the navigation bar.
+  - If not logged in, a login modal will prompt you to enter your credentials.
+  - After logging in, access the conversion interface to swap between crypto and fiat amounts.
+  - Use the swap button to toggle the conversion direction.
 
-```bash
-git clone https://github.com/vraj79/crypto.git
-cd crypto
-npm install
-```
+- **Navigation and Authentication:**
+  - The dynamic navbar provides easy access to the Home and Trade pages.
+  - Log in using a simple email and password form. The provided authentication is minimal and managed through a Zustand store.
 
-Run the development server:
-
-```bash
-npm run dev
-```
-
-Build for production:
-
-```bash
-npm run build
-```
-
-Preview the build locally:
-
-```bash
-npm run preview
-```
-
----
-
-## 📂 File-by-File Breakdown
-
-### **vite-env.d.ts**
-
-Provides type declarations for Vite environment variables.
-
-### **types/coin.ts**
-
-Defines the structure of cryptocurrency objects used across the app.
-
-### **store/userStore.ts**
-
-Zustand store to manage persistent authentication state (`login`, `logout`).
-
-### **components/Button.tsx**
-
-Reusable Tailwind-styled button component.
-
-### **components/InputField.tsx**
-
-Standardized input with label and focus styling.
-
-### **components/Navbar.tsx**
-
-Navigation bar with login modal, logout, and route switching.
-
-### **pages/Home.tsx**
-
-Displays top cryptocurrencies in a sortable and paginated table.
-
-### **pages/Trade.tsx**
-
-Conversion tool for crypto ↔ USD with protected access (requires login).
-
-### **App.tsx**
-
-Root component managing routes and authentication guard.
-
-### **main.tsx**
-
-Entry point: mounts app, applies routing, and loads global styles.
-
----
-
-## 🌐 Component & Data Flow
+## 🌐 Component & Data Flow  
 
 ```mermaid
 flowchart LR
@@ -152,13 +93,28 @@ flowchart LR
 
 ---
 
-## 🏁 Conclusion
+## Configuration
 
-This project is a solid starting point for a **crypto trading dashboard**. Its modular design—typed models, centralized store, reusable components, and routed pages—makes it easy to extend with features such as:
+This repository uses several configuration files to manage the development environment:
 
-- Real “Buy/Sell” flows
-- Detailed coin analytics pages
-- Enhanced authentication
-- Data visualizations (charts, graphs)
+- **Vite Configuration:**
+  - The project uses Vite for fast development and build processes. Check `vite.config.ts` for plugin configurations.
+  
+- **Tailwind CSS:**
+  - Styling is managed using Tailwind CSS. The `tailwind.config.js` file specifies the content paths and theme extensions.
+  
+- **PostCSS:**
+  - PostCSS and Autoprefixer are configured in `postcss.config.js`.
+  
+- **ESLint:**
+  - Code linting is enforced using ESLint configured in `eslint.config.js` with support for React hooks and TypeScript.
+  
+- **TypeScript:**
+  - The project is written in TypeScript. Configuration for the compiler is available in `tsconfig.json` and `tsconfig.app.json`.
+
+- **Zustand Persistence:**
+  - User state is managed via Zustand with persistence enabled through middleware. The configuration resides in `src/store/userStore.ts`.
+
+-----------------------------------------------------------------------------------------------------------------
 
 🔗 **Try it live here:** [Crypto Exchange](https://vraj79.github.io/crypto/)
