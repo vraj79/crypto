@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
           </form>
         </div>
       )}
-      <main className="p-4"></main>
+      <main className="p-0 md:p-4"></main>
     </>
   );
 };

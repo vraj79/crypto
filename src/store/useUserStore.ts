@@ -1,22 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import CryptoJS from "crypto-js";
 import type { TUserState } from "../types/types";
-
-const SECRET_KEY = "my-secret-key";
-
-function encrypt(data: string) {
-  return CryptoJS.AES.encrypt(data, SECRET_KEY).toString();
-}
-
-function decrypt(cipher: string) {
-  try {
-    const bytes = CryptoJS.AES.decrypt(cipher, SECRET_KEY);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (e) {
-    return null;
-  }
-}
+import { decrypt, encrypt } from "../utils/crypto";
 
 const useUserStore = create<TUserState>()(
   persist(

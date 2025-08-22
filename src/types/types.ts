@@ -77,3 +77,19 @@ export type TLoginForm = {
   email: string;
   password: string;
 };
+
+export type TCointTableProps = {
+  coins: TCoin[];
+  sortKey: TSortKey;
+  sortOrder: TSortOrder;
+  onSort: (key: TSortKey) => void;
+};
+
+export type TradeFormProps = {
+  coins: Array<{
+    id: string;
+    symbol: string;
+    name: string;
+    current_price: number;
+  }>;
+};
