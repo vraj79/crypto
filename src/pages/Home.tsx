@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import { useCoinStore } from "../store/useCoinStore";
 import type { TSortKey, TSortOrder } from "../types/types";
+import { ASC, DESC, NAME } from "../constants/constants";
 
 function Home() {
   const { coins, fetchCoins, hasMore, loading } = useCoinStore();
-  const [sortKey, setSortKey] = useState<TSortKey>("name");
-  const [sortOrder, setSortOrder] = useState<TSortOrder>("asc");
+  const [sortKey, setSortKey] = useState<TSortKey>(NAME);
+  const [sortOrder, setSortOrder] = useState<TSortOrder>(ASC);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
@@ -17,28 +18,32 @@ function Home() {
 
   const handleSort = (key: TSortKey) => {
     if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder(sortOrder === ASC ? DESC : ASC);
     } else {
       setSortKey(key);
-      setSortOrder("asc");
+      setSortOrder(ASC);
     }
   };
 
   const sortedCoins = [...coins].sort((a, b) => {
-    if (sortKey === "name") {
-      return sortOrder === "asc"
+    if (sortKey === NAME) {
+      return sortOrder === ASC
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name);
     } else {
-      return sortOrder === "asc"
+      return sortOrder === ASC
         ? a.current_price - b.current_price
         : b.current_price - a.current_price;
     }
   });
 
-  const renderSortSymbol = (key: "name" | "price") => {
+  const renderSortSymbol = (key: TSortKey) => {
     if (sortKey !== key) return "↕";
-    return sortOrder === "asc" ? "▲" : "▼";
+    return sortOrder === ASC ? "▲" : "▼";
+  };
+
+  const handleDropdownToggle = (id: string) => {
+    setOpenDropdown(openDropdown === id ? null : id);
   };
 
   return (
@@ -74,9 +79,7 @@ function Home() {
               <td className="border px-3 py-2">${c.current_price}</td>
               <td className="border px-3 py-2 relative">
                 <button
-                  onClick={() =>
-                    setOpenDropdown(openDropdown === c.id ? null : c.id)
-                  }
+                  onClick={() => handleDropdownToggle(c.id)}
                   className="px-3 py-1 bg-gray-100 rounded border"
                 >
                   Options

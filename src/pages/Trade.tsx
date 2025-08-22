@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import useUserStore from "../store/useUserStore";
 import { useAllCoinsStore } from "../store/useAllCoinsStore";
 import Button from "../components/Button";
 import Select from "../components/Select";
@@ -8,7 +7,6 @@ import type { TTradeState } from "../types/types";
 import useTradeCalculator from "../hooks/useTradeCalculator";
 
 function Trade() {
-  const { user } = useUserStore();
   const { coins, fetchAllCoins, loading } = useAllCoinsStore();
 
   const [tradeState, setTradeState] = useState<TTradeState>({
@@ -40,14 +38,6 @@ function Trade() {
     [coins]
   );
 
-  if (!user) {
-    return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-bold">Please login to access Trade Page</h2>
-      </div>
-    );
-  }
-
   if (loading && coins.length === 0) {
     return <div className="p-6 text-center">Loading coins...</div>;
   }
@@ -67,9 +57,11 @@ function Trade() {
             }
             type="number"
             value={tradeState.inputValue}
-            onChange={(e) =>
-              setTradeState((s) => ({ ...s, inputValue: e.target.value }))
-            }
+            onChange={(e) => {
+              const value = e.target.value;
+              if (Number(value) < 0) return;
+              setTradeState((s) => ({ ...s, inputValue: value }));
+            }}
             placeholder={tradeState.isCryptoFirst ? "0.0" : "0.00"}
             width="w-1/2"
           />
