@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../store/useUserStore";
 import type { TLoginForm } from "../types/types";
+import { decrypt } from "../utils/crypto";
 
 const useAuth = () => {
   const { user, login, logout } = useUserStore();
   const navigate = useNavigate();
 
-  const email = user ? atob(user.email) : null;
+  const email = user ? decrypt(user.email) : null;
 
   const handleLogin = (
     form: TLoginForm,
@@ -19,12 +20,12 @@ const useAuth = () => {
     }
     login(form.email);
     onSuccess();
-    navigate("/crypto/trade");
+    navigate("/trade");
   };
 
   const handleLogout = () => {
     logout();
-    navigate("/crypto/");
+    navigate("/");
   };
 
   return { email, handleLogin, handleLogout, isAuthenticated: !!user };

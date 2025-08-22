@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
       return;
     }
     setActivePage(page);
-    navigate(page === "home" ? "/crypto/" : `/crypto/${page}`);
+    navigate(page === "home" ? "/" : `/${page}`);
   };
 
   const handleLoginSubmit = (e: React.FormEvent) => {
@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
           </form>
         </div>
       )}
-      <main className="p-4"></main>
+      <main className="p-0 md:p-4"></main>
     </>
   );
 };
